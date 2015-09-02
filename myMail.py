@@ -56,6 +56,7 @@ class myMailOperation:
         filmHtml+='</div>'
         filmHtml+='<div id="filmInfo%d">'%n
         filmHtml+='<h3>电影名称:'+film['filmName']+'</h3>'
+        filmHtml+='<h4>上映日期:'+film['filmReleaseDate']+'</h4>'
         filmHtml+='<p>电影类型:'+film['filmStyle']+'</p>'
         filmHtml+='<p>语言:'+film['filmLanguage']+'</p>'
         filmHtml+='<p>时长:'+film['filmTime']+'</p>'
@@ -63,6 +64,8 @@ class myMailOperation:
         filmHtml+='<p>演员:'+film['filmActor']+'</p>'
         filmHtml+='<p>关注度:'+film['filmFocus']+'</p>'
         filmHtml+='<p>购买量:'+film['filmBuy']+'</p>'
-        filmHtml+='<p>评分:'+film['filmScore']+'</p></div></div>'
+        filmHtml+='<p>评分:'+film['filmScore']+'</p>'
+        filmHtml+='<p>影院上映信息:'+film['filmCinemaInfo']+'</p>'
+        filmHtml+='<p>更多详细信息:'+film['filmMoreInfoUrl']+'</p></div></div>'
         return filmHtml
 

@@ -28,10 +28,11 @@ class MySQLFilmOperation:
     def insertMovie(self,movieInfo):
         ISOTIMEFORMAT='%Y-%m-%d %X'
         insertTime=time.strftime(ISOTIMEFORMAT,time.localtime(time.time()))
-        insertSql='insert into filmlist values(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+        insertSql='insert into filmlist values(null,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
         try:
             n = self.cursor.execute(insertSql,[movieInfo['filmName'],movieInfo['filmStyle'],movieInfo['filmLanguage'],movieInfo['filmTime'],
-                                    movieInfo['filmDirector'],movieInfo['filmActor'],insertTime,movieInfo['filmFocus'],movieInfo['filmBuy'],movieInfo['filmScore'],movieInfo['filmImage'],movieInfo['filmImageUrl']])
+                                    movieInfo['filmDirector'],movieInfo['filmActor'],insertTime,movieInfo['filmFocus'],movieInfo['filmBuy'],movieInfo['filmScore'],movieInfo['filmImage'],movieInfo['filmImageUrl']
+                                               ,movieInfo['filmReleaseDate'],movieInfo['filmMoreInfoUrl'],movieInfo['filmCinemaInfo']])
             self.con.commit()
             print "insert",movieInfo['filmName'],"successfully"
         except:
@@ -46,6 +47,16 @@ class MySQLFilmOperation:
                 return 1
         except:
             print "check error"
+    def getFilm(self,focus=0,buy=0,score=0):
+        getSql="select * from filmlist where filmfocus>%d and filmbuy>%d and filmscore>%f order by filmscore desc"%(focus,buy,score)
+        try:
+            n = self.cursor.execute(getSql)
+            filmListInfo=self.cursor.fetchall()
+            return filmListInfo
+        except:
+            print "get error"
+            return 0
+
     def close(self):
         self.cursor.close()
         self.con.close()

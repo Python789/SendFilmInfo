@@ -59,6 +59,8 @@ def findHotFilmContent(n):#找出格瓦拉热门电影目录，包括电影名�
         filmScore1Reg='<sub style="margin:0;" data-keynum=".*?">(\d)</sub>'
         filmScore2Reg='<sup data-keynum=".*?">(.{2})</sup>'
         filmImageUrlReg='<img src="(.*?)"\s*?alt=".*?"\s*?height="\d*?"\s*?width="\d*?"/>'
+        filmCinemaInfoReg='<p>(\d*?家影院上映\d*?场)</p>'
+
         filmName=re.findall(filmNameReg,c)
         filmStyle=re.findall(filmStyleReg,c)
         filmLanguage=re.findall(filmLanguageReg,c)
@@ -70,6 +72,30 @@ def findHotFilmContent(n):#找出格瓦拉热门电影目录，包括电影名�
         filmScore1=re.findall(filmScore1Reg,c)
         filmScore2=re.findall(filmScore2Reg,c)
         filmImageUrl=re.findall(filmImageUrlReg,c)
+        filmCinemaInfo=re.findall(filmCinemaInfoReg,c)
+        ################2015-9-2添加，获取其他的一些电影信息信息 filmMoreInfoUrl，filmCinemaInfo，filmReleaseDate
+        filmMoreInfoUrlRe='<a href="(/movie/\d*?)" title=".*?" target="_blank" class="color3">.*?</a>'
+        filmMoreInfoUrl='http://www.gewara.com'+re.findall(filmMoreInfoUrlRe,c)[0]
+        filmReleaseDate=''
+        try:#获取上映日期
+            filmMoreInfoObj=urllib.urlopen(filmMoreInfoUrl)
+            filmMoreInfo=filmMoreInfoObj.read()
+            filmReleaseDateReg='<li class="first">上映时间：(.*?)</li>'
+            filmReleaseDate=re.findall(filmReleaseDateReg,filmMoreInfo)
+            filmMoreInfoObj.close()
+        except:
+            print 'get more film info error'
+        filmContent['filmMoreInfoUrl']=filmMoreInfoUrl
+        if len(filmCinemaInfo)==1:
+            filmContent['filmCinemaInfo']=filmCinemaInfo[0]
+        else:
+            filmContent['filmCinemaInfo']=''
+        if len(filmReleaseDate)==1:
+            filmContent['filmReleaseDate']=filmReleaseDate[0]
+        else:
+            filmContent['filmReleaseDate']=''
+
+        #########################################
         if len(filmName)==1:
             filmContent['filmName']=filmName[0]
             if len(filmStyle)==1:
@@ -121,6 +147,9 @@ def findHotFilmContent(n):#找出格瓦拉热门电影目录，包括电影名�
             print filmContent['filmBuy']
             print filmContent['filmScore']
             print filmContent['filmImageUrl']
+            print filmContent['filmMoreInfoUrl']
+            print filmContent['filmCinemaInfo']
+            print filmContent['filmReleaseDate']
             print '---'
         else:
             print filmName[0],filmNum,'find film info error'
@@ -141,7 +170,7 @@ def getZhongYingFilmContent(contentUrl):#获得南京南站中影的影片信息
 def writeFilmData(filmData,imagePath):
     i=0;
     newFilmList=[]
-    myDB=mySQLConnect.MySQLFilmOperation("192.168.1.112","root","cuijie.,1234","myfilm")
+    myDB=mySQLConnect.MySQLFilmOperation("192.168.1.123","root","cuijie.,1234","myfilm")
     for movie in filmData:
         exist=myDB.checkMovieExist(movie)
         if exist==0:
@@ -162,6 +191,33 @@ def writeFilmData(filmData,imagePath):
             #newFilmList.append(movie)#test
     myDB.close()
     return newFilmList
+def changeDataFormat(flimListInfo):
+    flimList=[]
+    for f in flimListInfo:
+        film={}
+        film['filmName']=f[1].encode("utf-8")
+        film['filmStyle']=f[2].encode("utf-8")
+        film['filmLanguage']=f[3].encode("utf-8")
+        film['filmTime']=f[4].encode("utf-8")
+        film['filmDirector']=f[5].encode("utf-8")
+        film['filmActor']=f[6].encode("utf-8")
+        film['filmFocus']='%d'%f[8]
+        film['filmBuy']='%d'%f[9]
+        film['filmScore']='%f'%f[10]
+        film['filmReleaseDate']=f[13].strftime('%Y-%m-%d')
+        film['filmMoreInfoUrl']=f[14].encode("utf-8")
+        film['filmCinemaInfo']=f[15].encode("utf-8")
+        flimList.append(film)
+    return flimList
+def SendDataBaseFilm():
+    myDB=mySQLConnect.MySQLFilmOperation("192.168.1.123","root","cuijie.,1234","myfilm")
+    flimListInfo=myDB.getFilm()
+    flimList=changeDataFormat(flimListInfo)
+    if len(flimListInfo)!=0:
+        myMailObj=myMail.myMailOperation("smtp.163.com","cuijie52410856","19910824cj","163.com")
+        myMailObj.sendFilm(flimList,['446306514@qq.com'])
+        myMailObj.close()
+    myDB.close()
 if __name__ == "__main__":
     saveImagePath="D:/MovieImage/"
     film=getGeWaLaFilmContent()
@@ -170,6 +226,7 @@ if __name__ == "__main__":
     for new in todayNewFilm:
         print "there is a new movie in GeWaLa:",new['filmName']
     if len(todayNewFilm)>0:
-        myMailObj=myMail.myMailOperation("smtp.163.com","cuijie52410856","password","163.com")
+        myMailObj=myMail.myMailOperation("smtp.163.com","cuijie52410856","19910824cj","163.com")
         myMailObj.sendFilm(todayNewFilm,['446306514@qq.com'])
         myMailObj.close()
+    #SendDataBaseFilm()
