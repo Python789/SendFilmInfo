@@ -65,7 +65,7 @@ class myMailOperation:
         filmHtml+='<p>关注度:'+film['filmFocus']+'</p>'
         filmHtml+='<p>购买量:'+film['filmBuy']+'</p>'
         filmHtml+='<p>评分:'+film['filmScore']+'</p>'
-        filmHtml+='<p>影院上映信息:'+film['filmCinemaInfo']+'</p>'
+        filmHtml+='<p><font color="#FF0000">'+film['filmCinemaInfo']+'</font></p>'
         filmHtml+='<p>更多详细信息:'+film['filmMoreInfoUrl']+'</p></div></div>'
         return filmHtml
 

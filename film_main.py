@@ -219,7 +219,7 @@ def SendDataBaseFilm():
         myMailObj.close()
     myDB.close()
 if __name__ == "__main__":
-    saveImagePath="D:/MovieImage/"
+    '''saveImagePath="D:/MovieImage/"
     film=getGeWaLaFilmContent()
     todayNewFilm=writeFilmData(film,saveImagePath)
     print "there is",len(todayNewFilm),"new moive in GeWaLa"
@@ -228,5 +228,5 @@ if __name__ == "__main__":
     if len(todayNewFilm)>0:
         myMailObj=myMail.myMailOperation("smtp.163.com","cuijie52410856","19910824cj","163.com")
         myMailObj.sendFilm(todayNewFilm,['446306514@qq.com'])
-        myMailObj.close()
-    #SendDataBaseFilm()
+        myMailObj.close()'''
+    SendDataBaseFilm()
